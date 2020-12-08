@@ -119,6 +119,7 @@ func createLabelsFromRequestResponse(router *mux.Router, r *http.Request, crw *c
 }
 
 func (adapter *Adapter) Open() {
+	adapter.logger.Info(fmt.Sprintf("host issss %s", adapter.host))
 	adapter.logger.Info(fmt.Sprintf("Listening on http://%s:%d", adapter.host, adapter.port))
 	if err := adapter.srv.ListenAndServe(); err != nil {
 		adapter.logger.Fatal(err)
