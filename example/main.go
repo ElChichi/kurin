@@ -19,7 +19,7 @@ func main() {
 	e := engineFactory.NewEngine()
 
 	// App
-	a := kurin.NewApp("Example", http.NewHTTPAdapter(e, 7272, logger))
+	a := kurin.NewApp("Example", http.NewHTTPAdapter(e, "iam", 7272, logger))
 	a.RegisterSystems(exampleProviderFactory)
 	a.Run()
 }

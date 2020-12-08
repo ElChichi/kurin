@@ -2,10 +2,11 @@ package http
 
 import (
 	"fmt"
-	"github.com/gorilla/mux"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/gorilla/mux"
 
 	"context"
 
@@ -20,6 +21,7 @@ type (
 	Adapter struct {
 		srv       *http.Server
 		port      int
+		host      string
 		version   string
 		healthy   bool
 		logger    kurin.Logger
@@ -28,9 +30,10 @@ type (
 	}
 )
 
-func NewHTTPAdapter(router *mux.Router, handler http.Handler, port int, version string, logger kurin.Logger) kurin.Adapter {
+func NewHTTPAdapter(router *mux.Router, handler http.Handler, host string, port int, version string, logger kurin.Logger) kurin.Adapter {
 	adapter := &Adapter{
 		port:    port,
+		host:    host,
 		version: version,
 		healthy: true,
 		logger:  logger,
@@ -70,7 +73,7 @@ func NewHTTPAdapter(router *mux.Router, handler http.Handler, port int, version 
 	mux.Handle("/", handlerCounter(router, totalCount, handlerDuration(router, durationHist, handler)))
 
 	adapter.srv = &http.Server{
-		Addr:         fmt.Sprintf(":%d", port),
+		Addr:         fmt.Sprintf("%s:%d", host, port),
 		Handler:      mux,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
@@ -101,7 +104,7 @@ func createLabelsFromRequestResponse(router *mux.Router, r *http.Request, crw *c
 	var match mux.RouteMatch
 	routeExists := router.Match(r, &match)
 	if routeExists && match.Route != nil {
-		handler,_ = match.Route.GetPathTemplate()
+		handler, _ = match.Route.GetPathTemplate()
 	}
 
 	labels := prometheus.Labels{}
