@@ -72,6 +72,9 @@ func NewHTTPAdapter(router *mux.Router, handler http.Handler, host string, port 
 	mux.Handle("/metrics", promhttp.Handler())
 	mux.Handle("/", handlerCounter(router, totalCount, handlerDuration(router, durationHist, handler)))
 
+	fmt.Println("address is")
+	fmt.Println(fmt.Sprintf("%s:%d", host, port))
+
 	adapter.srv = &http.Server{
 		Addr:         fmt.Sprintf("%s:%d", host, port),
 		Handler:      mux,
@@ -116,7 +119,7 @@ func createLabelsFromRequestResponse(router *mux.Router, r *http.Request, crw *c
 }
 
 func (adapter *Adapter) Open() {
-	adapter.logger.Info(fmt.Sprintf("Listening on http://0.0.0.0:%d", adapter.port))
+	adapter.logger.Info(fmt.Sprintf("Listening on http://%s:%d", adapter.host, adapter.port))
 	if err := adapter.srv.ListenAndServe(); err != nil {
 		adapter.logger.Fatal(err)
 	}
